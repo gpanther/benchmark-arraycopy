@@ -30,6 +30,10 @@ public abstract class AbstractBenchmark {
 		} else if (arrayItemClazz == long.class) {
 			arrayBaseOffset = Unsafe.ARRAY_LONG_BASE_OFFSET;
 			indexScale = Unsafe.ARRAY_LONG_INDEX_SCALE;
+		} else if (arrayItemClazz == Object.class) {
+			arrayBaseOffset = Unsafe.ARRAY_OBJECT_BASE_OFFSET;
+			indexScale = Unsafe.ARRAY_OBJECT_INDEX_SCALE;
+			arrayItemSizeBytes = (int) indexScale;
 		} else {
 			throw new IllegalArgumentException(arrayItemClazz.getName());
 		}
