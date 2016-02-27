@@ -2,32 +2,14 @@ package net.greypanther;
 
 import java.util.Random;
 
+import org.openjdk.jol.util.VMSupport;
+
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public final class CheckArrayAlignments_JustAllocate {
 	private static final Unsafe UNSAFE = AbstractBenchmark.UNSAFE; 
 			
-	private static long getObjectAddress(Object o) {
-		Object[] objectArray = { o };
-
-		long baseOffset = Unsafe.ARRAY_OBJECT_BASE_OFFSET;
-		int addressSize = UNSAFE.addressSize();
-		long address;
-		switch (addressSize) {
-		case 4:
-			address = UNSAFE.getInt(objectArray, baseOffset);
-			break;
-		case 8:
-			address = UNSAFE.getLong(objectArray, baseOffset);
-			break;
-		default:
-			throw new Error("unsupported address size: " + addressSize);
-		}
-
-		return address;
-	}
-
 	private static String getAlignment(long address) {
 		StringBuilder result = new StringBuilder(4);
 		result.append(address % 4 == 0 ? '4' : '-');
@@ -38,7 +20,7 @@ public final class CheckArrayAlignments_JustAllocate {
 	}
 
 	static void printObjectAlignment(Object o) {
-		long objectAddress = getObjectAddress(o);
+		long objectAddress = VMSupport.addressOf(o);
 		long firstItemAddress = objectAddress + UNSAFE.arrayBaseOffset(o.getClass());
 		System.out.println(getAlignment(objectAddress) + "\t" + getAlignment(firstItemAddress));
 	}
