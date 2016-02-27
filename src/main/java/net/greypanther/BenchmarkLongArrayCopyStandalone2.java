@@ -76,20 +76,20 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		}
 	}
 
-	@Param({ "1024" })
-	int size;
-
-	@Benchmark
-	public final void arraycopy() {
-		System.arraycopy(source, 0, destination, 0, size);
-	}
-
 	private static void sleep(long duration, TimeUnit timeUnit) {
 		try {
 			Thread.sleep(timeUnit.toMillis(duration));
 		} catch (InterruptedException e) {
 			throw new AssertionError();
 		}
+	}
+
+	@Param({ "1024" })
+	int size;
+
+	@Benchmark
+	public final void arraycopy() {
+		System.arraycopy(source, 0, destination, 0, size);
 	}
 
 	@Benchmark
