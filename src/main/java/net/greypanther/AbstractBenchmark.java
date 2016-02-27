@@ -10,7 +10,7 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public abstract class AbstractBenchmark {
-	private static final Unsafe UNSAFE = getUnsafe();
+	static final Unsafe UNSAFE = getUnsafe();
 
 	private final long arrayBaseOffset, indexScale;
 	private final int arrayItemSizeBytes;

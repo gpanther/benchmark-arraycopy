@@ -1,52 +1,61 @@
 package net.greypanther;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.CompilerControl;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(3)
 @State(Scope.Benchmark)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@CompilerControl(CompilerControl.Mode.DONT_INLINE)
 public class BenchmarkLongArrayCopyStandalone {
-	private static final long[] SOURCE = createSourceOfSizeKb(10_000);
-	private static final long[] DESTINATION = createDestionationOfSizeKb(10_000);
 
-	@Param({ "1", "10" })
-	public int sizeInKb;
+	@Param({ "1024" })
+	int size;
 
-	public int sizeInItems;
-
-	@Benchmark
-	public final void benchmarkArraySystemArraycopy() {
-		System.arraycopy(SOURCE, 0, DESTINATION, 0, sizeInItems);
-	}
-
-	@Benchmark
-	public final void benchmarkArrayManualCopy_Dec() {
-		for (int i = sizeInItems - 1; i >= 0; --i) {
-			DESTINATION[i] = SOURCE[i];
-		}
-	}
+	byte[] pad;
+	long[] source, destination;
 
 	@Setup
 	public void setUp() {
-		sizeInItems = sizeInKb * 1024 / Long.BYTES;
-	}
-
-	private static long[] createDestionationOfSizeKb(int sizeInKb) {
-		int sizeInItems = sizeInKb * 1024 / Long.BYTES;
-		long[] result = new long[sizeInItems];
 		Random r = new Random(42);
-		for (int i = 0; i < result.length; ++i) {
-			result[i] = r.nextInt();
+
+		pad = new byte[new Random().nextInt(1024)];
+		source = new long[size];
+		destination = new long[size];
+
+		for (int i = 0; i < size; ++i) {
+			source[i] = r.nextInt();
 		}
-		return result;
+
+		// Promote the shit out of both arrays
+		System.gc();
 	}
 
-	private static long[] createSourceOfSizeKb(int sizeInKb) {
-		int sizeInItems = sizeInKb * 1024 / Long.BYTES;
-		return new long[sizeInItems];
+	@Benchmark
+	public void arraycopy() {
+		System.arraycopy(source, 0, destination, 0, size);
+	}
+
+	@Benchmark
+	public void manualCopy() {
+		for (int i = 0; i < size; i++) {
+			destination[i] = source[i];
+		}
 	}
 }
