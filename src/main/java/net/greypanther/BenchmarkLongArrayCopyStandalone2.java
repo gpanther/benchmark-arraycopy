@@ -35,7 +35,7 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		Random randomRandom = new Random();
 
 		while (true) {
-			padding1 = new byte[randomRandom.nextInt(64)];
+			padding1 = new byte[randomRandom.nextInt(128)];
 			source = new long[MAXIMUM_SIZE];
 
 			for (int i = 0; i < 10; ++i) {
@@ -43,7 +43,7 @@ public class BenchmarkLongArrayCopyStandalone2 {
 				sleep(100, TimeUnit.MILLISECONDS);
 			}
 
-			long sourceAddressAlignment = VMSupport.addressOf(source) % 32;
+			long sourceAddressAlignment = VMSupport.addressOf(source) % 64;
 			if (sourceAddressAlignment == 0) {
 				break;
 			} else {
@@ -53,7 +53,7 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		System.out.println("Allocated source");
 
 		while (true) {
-			padding2 = new byte[randomRandom.nextInt(64)];
+			padding2 = new byte[randomRandom.nextInt(128)];
 			destination = new long[MAXIMUM_SIZE];
 
 			for (int i = 0; i < 10; ++i) {
@@ -61,7 +61,7 @@ public class BenchmarkLongArrayCopyStandalone2 {
 				sleep(100, TimeUnit.MILLISECONDS);
 			}
 
-			long destinationAddressAlignment = VMSupport.addressOf(destination) % 32;
+			long destinationAddressAlignment = VMSupport.addressOf(destination) % 64;
 			if (destinationAddressAlignment == 0) {
 				break;
 			} else {
