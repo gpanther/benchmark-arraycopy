@@ -26,63 +26,12 @@ import org.openjdk.jol.util.VMSupport;
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 public class BenchmarkLongArrayCopyStandalone2 {
 	private static final int MAXIMUM_SIZE = 10_000;
+	private static final int ALIGNMENT = 64;
 
 	@SuppressWarnings("unused")
 	private static byte[] padding1, padding2;
 	private static long[] source, destination;
-
-	static {
-		Random randomRandom = new Random();
-
-		while (true) {
-			padding1 = new byte[randomRandom.nextInt(128)];
-			source = new long[MAXIMUM_SIZE];
-
-			for (int i = 0; i < 10; ++i) {
-				System.gc();
-				sleep(100, TimeUnit.MILLISECONDS);
-			}
-
-			long sourceAddressAlignment = VMSupport.addressOf(source) % 64;
-			if (sourceAddressAlignment == 0) {
-				break;
-			} else {
-				System.out.print(sourceAddressAlignment + " ");
-			}
-		}
-		System.out.println("Allocated source");
-
-		while (true) {
-			padding2 = new byte[randomRandom.nextInt(128)];
-			destination = new long[MAXIMUM_SIZE];
-
-			for (int i = 0; i < 10; ++i) {
-				System.gc();
-				sleep(100, TimeUnit.MILLISECONDS);
-			}
-
-			long destinationAddressAlignment = VMSupport.addressOf(destination) % 64;
-			if (destinationAddressAlignment == 0) {
-				break;
-			} else {
-				System.out.print(destinationAddressAlignment + " ");
-			}
-		}
-		System.out.println("Allocated destination");
-
-		Random r = new Random(42);
-		for (int i = 0; i < MAXIMUM_SIZE; ++i) {
-			source[i] = r.nextInt();
-		}
-	}
-
-	private static void sleep(long duration, TimeUnit timeUnit) {
-		try {
-			Thread.sleep(timeUnit.toMillis(duration));
-		} catch (InterruptedException e) {
-			throw new AssertionError();
-		}
-	}
+	private static long sourceAddress, destinationAddress;
 
 	@Param({ "1024" })
 	int size;
@@ -108,12 +57,65 @@ public class BenchmarkLongArrayCopyStandalone2 {
 
 	@Setup
 	public void setUp() {
-		if (VMSupport.addressOf(source) % 32 != 0) {
+		if (VMSupport.addressOf(source) != sourceAddress) {
 			throw new IllegalArgumentException("source");
 		}
 
-		if (VMSupport.addressOf(destination) % 32 != 0) {
+		if (VMSupport.addressOf(destination) != destinationAddress) {
 			throw new IllegalArgumentException("destination");
+		}
+	}
+
+	static {
+		Random randomRandom = new Random();
+
+		while (true) {
+			padding1 = new byte[randomRandom.nextInt(128)];
+			source = new long[MAXIMUM_SIZE];
+
+			for (int i = 0; i < 10; ++i) {
+				System.gc();
+				sleep(100, TimeUnit.MILLISECONDS);
+			}
+
+			sourceAddress = VMSupport.addressOf(source);
+			if (sourceAddress % ALIGNMENT == 0) {
+				break;
+			} else {
+				System.out.print((sourceAddress % ALIGNMENT) + " ");
+			}
+		}
+		System.out.println("Allocated source");
+
+		while (true) {
+			padding2 = new byte[randomRandom.nextInt(128)];
+			destination = new long[MAXIMUM_SIZE];
+
+			for (int i = 0; i < 10; ++i) {
+				System.gc();
+				sleep(100, TimeUnit.MILLISECONDS);
+			}
+
+			destinationAddress = VMSupport.addressOf(destination);
+			if (destinationAddress % ALIGNMENT == 0) {
+				break;
+			} else {
+				System.out.print((destinationAddress % ALIGNMENT) + " ");
+			}
+		}
+		System.out.println("Allocated destination");
+
+		Random r = new Random(42);
+		for (int i = 0; i < MAXIMUM_SIZE; ++i) {
+			source[i] = r.nextInt();
+		}
+	}
+
+	private static void sleep(long duration, TimeUnit timeUnit) {
+		try {
+			Thread.sleep(timeUnit.toMillis(duration));
+		} catch (InterruptedException e) {
+			throw new AssertionError();
 		}
 	}
 }
