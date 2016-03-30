@@ -17,8 +17,8 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jol.util.VMSupport;
 
-@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(0)
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -26,53 +26,49 @@ import org.openjdk.jol.util.VMSupport;
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 public class BenchmarkLongArrayCopyStandalone2 {
 	private static final int MAXIMUM_SIZE = 10_000;
-	private static final int ALIGNMENT = 64;
 
-	private static long sourceAddress, destinationAddress;
+	@SuppressWarnings("unused")
+	private static byte[] padding1, padding2;
 	private static long[] source, destination;
 
-	@Param({ "1024" })
-	int size;
-
-	@Benchmark
-	public final void arraycopy() {
-		System.arraycopy(source, 6, destination, 6, size);
-	}
-
-	@Benchmark
-	public final void manualCopy() {
-		for (int i = 6; i < size; i++) {
-			destination[i] = source[i];
-		}
-	}
-
-	@Benchmark
-	public final void manualCopy_Dec() {
-		for (int i = size - 1; i >= 6; i--) {
-			destination[i] = source[i];
-		}
-	}
-
-	@Setup
-	public void setUp() {
-		if (VMSupport.addressOf(source) != sourceAddress) {
-			throw new IllegalArgumentException("source");
-		}
-
-		if (VMSupport.addressOf(destination) != destinationAddress) {
-			throw new IllegalArgumentException("destination");
-		}
-	}
-
 	static {
-		source = new long[MAXIMUM_SIZE];
-		sourceAddress = VMSupport.addressOf(source);
-		destination = new long[MAXIMUM_SIZE];
-		destinationAddress = VMSupport.addressOf(destination);
+		Random randomRandom = new Random();
 
-		if (alignment(source) != 16 && alignment(destination) != 16) {
-			throw new IllegalArgumentException(alignment(source) + " " + alignment(destination));
+		while (true) {
+			padding1 = new byte[randomRandom.nextInt(128)];
+			source = new long[MAXIMUM_SIZE];
+
+			for (int i = 0; i < 10; ++i) {
+				System.gc();
+				sleep(100, TimeUnit.MILLISECONDS);
+			}
+
+			long sourceAddressAlignment = alignment(source);
+			if (sourceAddressAlignment == 0) {
+				break;
+			} else {
+				System.out.print(sourceAddressAlignment + " ");
+			}
 		}
+		System.out.println("Allocated source");
+
+		while (true) {
+			padding2 = new byte[randomRandom.nextInt(128)];
+			destination = new long[MAXIMUM_SIZE];
+
+			for (int i = 0; i < 10; ++i) {
+				System.gc();
+				sleep(100, TimeUnit.MILLISECONDS);
+			}
+
+			long destinationAddressAlignment = alignment(destination);
+			if (destinationAddressAlignment == 0) {
+				break;
+			} else {
+				System.out.print(destinationAddressAlignment + " ");
+			}
+		}
+		System.out.println("Allocated destination");
 
 		Random r = new Random(42);
 		for (int i = 0; i < MAXIMUM_SIZE; ++i) {
@@ -80,10 +76,51 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		}
 	}
 
+	private static void sleep(long duration, TimeUnit timeUnit) {
+		try {
+			Thread.sleep(timeUnit.toMillis(duration));
+		} catch (InterruptedException e) {
+			throw new AssertionError();
+		}
+	}
+
+	@Param({ "1024" })
+	int size;
+
+	@Benchmark
+	public final void arraycopy() {
+		System.arraycopy(source, 0, destination, 0, size);
+	}
+
+	@Benchmark
+	public final void manualCopy() {
+		for (int i = 0; i < size; i++) {
+			destination[i] = source[i];
+		}
+	}
+
+	@Benchmark
+	public final void manualCopy_Dec() {
+		for (int i = size - 1; i >= 0; i--) {
+			destination[i] = source[i];
+		}
+	}
+
+	@Setup
+	public void setUp() {
+		if (alignment(source) != 0) {
+			throw new IllegalArgumentException("source");
+		}
+
+		if (alignment(destination) != 0) {
+			throw new IllegalArgumentException("destination");
+		}
+	}
+
 	private static long alignment(long[] array) {
 		long address = VMSupport.addressOf(array);
 		@SuppressWarnings("restriction")
-		long resultAlignment = (address + sun.misc.Unsafe.ARRAY_LONG_BASE_OFFSET) % ALIGNMENT;
-		return resultAlignment;
+		long addressAlignment = (address + sun.misc.Unsafe.ARRAY_LONG_BASE_OFFSET) % 32;
+		return addressAlignment;
 	}
 }
