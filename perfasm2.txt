@@ -1,0 +1,659 @@
+# JMH 1.11.3 (released 77 days ago)
+# VM version: JDK 9-ea, VM 9-ea+111
+# VM invoker: /home/balazsa/Downloads/jdk-9-111/bin/java
+# VM options: -Djol.tryWithSudo=true
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: net.greypanther.BenchmarkLongArrayCopyStandalone2.arraycopy
+# Parameters: (size = 1024)
+
+# Run progress: 0.00% complete, ETA 00:00:30
+# Fork: 1 of 1
+# Preparing profilers: LinuxPerfAsmProfiler 
+# Profilers consume stdout and stderr from target VM, use -v EXTRA to copy to console
+# Warmup Iteration   1: 24 32 Allocated source
+48 56 32 8 40 Allocated destination
+Source alignment: 0
+Destination alignment: 0
+172.951 ns/op
+# Warmup Iteration   2: 182.600 ns/op
+# Warmup Iteration   3: 173.150 ns/op
+# Warmup Iteration   4: 174.056 ns/op
+# Warmup Iteration   5: 169.992 ns/op
+Iteration   1: 181.242 ns/op
+Iteration   2: 193.317 ns/op
+Iteration   3: 197.616 ns/op
+Iteration   4: 209.654 ns/op
+Iteration   5: 193.689 ns/op
+# Processing profiler results: LinuxPerfAsmProfiler 
+
+
+Result "arraycopy":
+  195.104 ±(99.9%) 39.240 ns/op [Average]
+  (min, avg, max) = (181.242, 195.104, 209.654), stdev = 10.190
+  CI (99.9%): [155.864, 234.343] (assumes normal distribution)
+
+Secondary result "·asm":
+PrintAssembly processed: 160959 total address lines.
+Perf output processed (skipped 15.600 seconds):
+ Column 1: cycles (6900 events)
+ Column 2: instructions (6838 events)
+
+Hottest code regions (>10.00% "cycles" events):
+....[Hottest Region 1]..............................................................................
+ [0x7fb5e00e5e4e:0x7fb5e00e5edf] in StubRoutines::jlong_disjoint_arraycopy
+
+           0.01%         0x00007fb5e00e5e4e: neg    %rdx
+                  ╭      0x00007fb5e00e5e51: jmpq   Stub::jlong_disjoint_arraycopy+72 0x00007fb5e00e5e88
+                  │↗  ↗  0x00007fb5e00e5e56: mov    0x8(%rdi,%rdx,8),%rax
+                  ││  │  0x00007fb5e00e5e5b: mov    %rax,0x8(%rcx,%rdx,8)
+                  ││  │  0x00007fb5e00e5e60: inc    %rdx
+                  │╰  │  0x00007fb5e00e5e63: jne    Stub::jlong_disjoint_arraycopy+22 0x00007fb5e00e5e56
+                  │   │  0x00007fb5e00e5e65: xor    %rax,%rax
+                  │   │  0x00007fb5e00e5e68: leaveq 
+                  │   │  0x00007fb5e00e5e69: retq   
+                  │   │  0x00007fb5e00e5e6a: nopw   0x0(%rax,%rax,1)
+  3.22%    2.22%  │ ↗ │  0x00007fb5e00e5e70: vmovdqu -0x38(%rdi,%rdx,8),%ymm0
+  3.88%    4.49%  │ │ │  0x00007fb5e00e5e76: vmovdqu %ymm0,-0x38(%rcx,%rdx,8)
+  4.81%    4.34%  │ │ │  0x00007fb5e00e5e7c: vmovdqu -0x18(%rdi,%rdx,8),%ymm1
+ 28.12%   16.44%  │ │ │  0x00007fb5e00e5e82: vmovdqu %ymm1,-0x18(%rcx,%rdx,8)
+ 49.30%   58.41%  ↘ │ │  0x00007fb5e00e5e88: add    $0x8,%rdx
+                    ╰ │  0x00007fb5e00e5e8c: jle    Stub::jlong_disjoint_arraycopy+48 0x00007fb5e00e5e70
+  0.12%    0.50%      │  0x00007fb5e00e5e8e: sub    $0x4,%rdx
+                     ╭│  0x00007fb5e00e5e92: jg     Stub::jlong_disjoint_arraycopy+100 0x00007fb5e00e5ea4
+                     ││  0x00007fb5e00e5e94: vmovdqu -0x18(%rdi,%rdx,8),%ymm0
+                     ││  0x00007fb5e00e5e9a: vmovdqu %ymm0,-0x18(%rcx,%rdx,8)
+                     ││  0x00007fb5e00e5ea0: add    $0x4,%rdx
+  0.09%    0.10%     ↘│  0x00007fb5e00e5ea4: (bad)  
+                      │  0x00007fb5e00e5ea7: rol    $0xf5,%ch
+                      │  0x00007fb5e00e5eaa: out    %eax,(%dx)
+                      │  0x00007fb5e00e5eab: leaveq 
+  0.01%               │  0x00007fb5e00e5eac: sub    $0x4,%rdx
+                      ╰  0x00007fb5e00e5eb0: jl     Stub::jlong_disjoint_arraycopy+22 0x00007fb5e00e5e56
+  0.16%    0.44%         0x00007fb5e00e5eb2: xor    %rax,%rax
+                         0x00007fb5e00e5eb5: leaveq 
+  0.45%    0.54%         0x00007fb5e00e5eb6: retq   
+                       StubRoutines::jlong_arraycopy [0x00007fb5e00e5ec0, 0x00007fb5e00e5f43[ (131 bytes)
+                         0x00007fb5e00e5ec0: push   %rbp
+                         0x00007fb5e00e5ec1: mov    %rsp,%rbp
+                         0x00007fb5e00e5ec4: cmp    %rdi,%rsi
+                         0x00007fb5e00e5ec7: lea    (%rdi,%rdx,8),%rax
+                         0x00007fb5e00e5ecb: jbe    Stub::jlong_disjoint_arraycopy+4 0x00007fb5e00e5e44
+                         0x00007fb5e00e5ed1: cmp    %rax,%rsi
+                         0x00007fb5e00e5ed4: jae    Stub::jlong_disjoint_arraycopy+4 0x00007fb5e00e5e44
+                         0x00007fb5e00e5eda: jmpq   Stub::jlong_arraycopy+86 0x00007fb5e00e5f16
+                         0x00007fb5e00e5edf: mov    -0x8(%rdi,%rdx,8),%rax
+....................................................................................................
+ 90.16%   87.48%  <total for region 1>
+
+....[Hottest Regions]...............................................................................
+ 90.16%   87.48%  [0x7fb5e00e5e4e:0x7fb5e00e5edf] in StubRoutines::jlong_disjoint_arraycopy
+  6.04%    8.85%  [0x7fb5e7b9bb80:0x7fb5e7b9bc1b] in net.greypanther.BenchmarkLongArrayCopyStandalone2::arraycopy
+  0.64%    0.61%  [0xffffffff810603fa:0xffffffff810603fa] in [unknown] ([unknown])
+  0.48%    1.16%  [0x7fb5e7b9de88:0x7fb5e7b9dedd] in net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_arraycopy_jmhTest::arraycopy_avgt_jmhStub
+  0.45%    0.10%  [0x7fb5e00e5e20:0x7fb5e00e5e70] in StubRoutines::jlong_disjoint_arraycopy
+  0.07%    0.03%  [0xffffffff8121aea2:0xffffffff8121aec6] in [unknown] ([unknown])
+  0.07%    0.15%  [0x7fb5ffaa2940:0x7fb5ffaa297b] in _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.04%    0.03%  [0xffffffff817f0c60:0xffffffff817f0c60] in [unknown] ([unknown])
+  0.04%           [0xffffffff817f2a50:0xffffffff817f2a64] in [unknown] ([unknown])
+  0.04%    0.03%  [0x7fb5ffee7e45:0x7fb5ffee7e5b] in _ZN12outputStream15update_positionEPKcm (libjvm.so)
+  0.03%           [0xffffffff810b1489:0xffffffff810b1489] in [unknown] ([unknown])
+  0.03%    0.04%  [0xffffffff810dd35b:0xffffffff810dd37c] in [unknown] ([unknown])
+  0.03%    0.03%  [0xffffffff81175642:0xffffffff81175642] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff811fe943:0xffffffff811fe96c] in [unknown] ([unknown])
+  0.03%           [0xffffffff81200130:0xffffffff8120014d] in [unknown] ([unknown])
+  0.03%           [0xffffffff8123340f:0xffffffff8123340f] in [unknown] ([unknown])
+  0.03%           [0xffffffff813cf81d:0xffffffff813cf81d] in [unknown] ([unknown])
+  0.03%           [0xffffffff813d4be9:0xffffffff813d4beb] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff817f2c90:0xffffffff817f2c9c] in [unknown] ([unknown])
+  0.03%           [0x7fb5ffee8166:0x7fb5ffee816e] in _ZN12outputStream44do_vsnprintf_and_write_with_automatic_bufferEPKcP13__va_list_tagb (libjvm.so)
+  1.65%    1.46%  <...other 175 warm regions...>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+....[Hottest Methods (after inlining)]..............................................................
+ 90.61%   87.58%  StubRoutines::jlong_disjoint_arraycopy
+  6.04%    8.85%  net.greypanther.BenchmarkLongArrayCopyStandalone2::arraycopy
+  1.81%    1.35%  [unknown] ([unknown])
+  0.48%    1.16%  net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_arraycopy_jmhTest::arraycopy_avgt_jmhStub
+  0.07%    0.15%  _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.06%    0.01%  _ZN9xmlStream10write_textEPKcm (libjvm.so)
+  0.04%    0.01%  _ZN12outputStream44do_vsnprintf_and_write_with_automatic_bufferEPKcP13__va_list_tagb (libjvm.so)
+  0.04%    0.04%  _ZN12outputStream15update_positionEPKcm (libjvm.so)
+  0.04%    0.10%  vfprintf (libc-2.21.so)
+  0.04%    0.03%  print_insn (hsdis-amd64.so)
+  0.03%    0.04%  [unknown] (libpthread-2.21.so)
+  0.03%           __strchr_sse2 (libc-2.21.so)
+  0.03%           __clock_gettime (libc-2.21.so)
+  0.03%    0.07%  _IO_fwrite (libc-2.21.so)
+  0.03%           <stub: method entry point (kind = native)>
+  0.01%           _ZN8ValueMap11kill_memoryEv (libjvm.so)
+  0.01%           fwrite@plt (libjvm.so)
+  0.01%    0.01%  _ZN10fileStream5writeEPKcm (libjvm.so)
+  0.01%           <stub: lconst_1  10 lconst_1>
+  0.01%           _ZN7nmethod21find_pc_desc_internalEPhb (libjvm.so)
+  0.52%    0.13%  <...other 36 warm methods...>
+....................................................................................................
+ 99.99%   99.55%  <totals>
+
+....[Distribution by Area]..........................................................................
+ 97.20%   97.60%  <generated code>
+  1.81%    1.35%  <native code in ([unknown])>
+  0.61%    0.63%  <native code in (libjvm.so)>
+  0.25%    0.34%  <native code in (libc-2.21.so)>
+  0.07%    0.03%  <native code in (hsdis-amd64.so)>
+  0.04%    0.04%  <native code in (libpthread-2.21.so)>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+
+
+# JMH 1.11.3 (released 77 days ago)
+# VM version: JDK 9-ea, VM 9-ea+111
+# VM invoker: /home/balazsa/Downloads/jdk-9-111/bin/java
+# VM options: -Djol.tryWithSudo=true
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: net.greypanther.BenchmarkLongArrayCopyStandalone2.manualCopy
+# Parameters: (size = 1024)
+
+# Run progress: 33.33% complete, ETA 00:00:48
+# Fork: 1 of 1
+# Preparing profilers: LinuxPerfAsmProfiler 
+# Profilers consume stdout and stderr from target VM, use -v EXTRA to copy to console
+# Warmup Iteration   1: 56 32 Allocated source
+16 24 Allocated destination
+Source alignment: 0
+Destination alignment: 0
+95.024 ns/op
+# Warmup Iteration   2: 93.115 ns/op
+# Warmup Iteration   3: 96.008 ns/op
+# Warmup Iteration   4: 92.886 ns/op
+# Warmup Iteration   5: 103.112 ns/op
+Iteration   1: 95.231 ns/op
+Iteration   2: 104.826 ns/op
+Iteration   3: 93.976 ns/op
+Iteration   4: 90.439 ns/op
+Iteration   5: 92.674 ns/op
+# Processing profiler results: LinuxPerfAsmProfiler 
+
+
+Result "manualCopy":
+  95.429 ±(99.9%) 21.348 ns/op [Average]
+  (min, avg, max) = (90.439, 95.429, 104.826), stdev = 5.544
+  CI (99.9%): [74.081, 116.777] (assumes normal distribution)
+
+Secondary result "·asm":
+PrintAssembly processed: 160590 total address lines.
+Perf output processed (skipped 12.138 seconds):
+ Column 1: cycles (6838 events)
+ Column 2: instructions (6848 events)
+
+Hottest code regions (>10.00% "cycles" events):
+....[Hottest Region 1]..............................................................................
+ [0x7f2c7fb99c60:0x7f2c7fb99e30] in net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy
+
+                                # {method} {0x00007f2c74824e60} &apos;manualCopy&apos; &apos;()V&apos; in &apos;net/greypanther/BenchmarkLongArrayCopyStandalone2&apos;
+                                #           [sp+0x20]  (sp of caller)
+                                0x00007f2c7fb99c60: mov    0x8(%rsi),%r10d
+                                0x00007f2c7fb99c64: shl    $0x3,%r10
+                                0x00007f2c7fb99c68: cmp    %r10,%rax
+                                0x00007f2c7fb99c6b: jne    0x00007f2c780d7f60  ;   {runtime_call ic_miss_stub}
+                                0x00007f2c7fb99c71: xchg   %ax,%ax
+                                0x00007f2c7fb99c74: nopl   0x0(%rax,%rax,1)
+                                0x00007f2c7fb99c7c: xchg   %ax,%ax
+                              [Verified Entry Point]
+  0.22%    0.35%                0x00007f2c7fb99c80: mov    %eax,-0x14000(%rsp)
+  0.06%    0.03%                0x00007f2c7fb99c87: push   %rbp
+  0.01%    0.04%                0x00007f2c7fb99c88: sub    $0x10,%rsp         ;*synchronization entry
+                                                                              ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@-1 (line 105)
+  0.32%    0.25%                0x00007f2c7fb99c8c: mov    %rsi,%rcx
+  0.01%    0.04%                0x00007f2c7fb99c8f: mov    0xc(%rsi),%ebx     ;*getfield size {reexecute=0 rethrow=0 return_oop=0}
+                                                                              ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@4 (line 105)
+  0.01%    0.06%                0x00007f2c7fb99c92: test   %ebx,%ebx
+                  ╭             0x00007f2c7fb99c94: jle    0x00007f2c7fb99e0e  ;*if_icmpge {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                           ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@7 (line 105)
+  0.35%    0.51%  │             0x00007f2c7fb99c9a: mov    $0x6c6c5e9c0,%r10  ;   {oop(a &apos;java/lang/Class&apos; = &apos;net/greypanther/BenchmarkLongArrayCopyStandalone2&apos;)}
+  0.01%           │             0x00007f2c7fb99ca4: mov    0x78(%r10),%r8d    ;*getstatic source {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                           ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@14 (line 106)
+  0.03%    0.03%  │             0x00007f2c7fb99ca8: mov    0xc(%r12,%r8,8),%r11d  ;*laload {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                           ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@18 (line 106)
+                  │                                                           ; implicit exception: dispatches to 0x00007f2c7fb99e1d
+  0.50%    0.79%  │             0x00007f2c7fb99cad: test   %r11d,%r11d
+                  │╭            0x00007f2c7fb99cb0: jbe    0x00007f2c7fb99e1d
+  0.35%    0.61%  ││            0x00007f2c7fb99cb6: mov    %ebx,%r9d
+                  ││            0x00007f2c7fb99cb9: dec    %r9d
+  0.01%           ││            0x00007f2c7fb99cbc: cmp    %r11d,%r9d
+                  ││╭           0x00007f2c7fb99cbf: jae    0x00007f2c7fb99e1d
+  0.13%    0.10%  │││           0x00007f2c7fb99cc5: mov    0x7c(%r10),%r11d   ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││                                                         ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+  0.35%    0.48%  │││           0x00007f2c7fb99cc9: mov    0xc(%r12,%r11,8),%r10d  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││                                                         ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@19 (line 106)
+                  │││                                                         ; implicit exception: dispatches to 0x00007f2c7fb99e1d
+  2.00%    3.23%  │││           0x00007f2c7fb99cce: test   %r10d,%r10d
+                  │││╭          0x00007f2c7fb99cd1: jbe    0x00007f2c7fb99e1d
+  0.28%    0.44%  ││││          0x00007f2c7fb99cd7: cmp    %r10d,%r9d
+                  ││││╭         0x00007f2c7fb99cda: jae    0x00007f2c7fb99e1d
+  0.07%    0.01%  │││││         0x00007f2c7fb99ce0: lea    (%r12,%r8,8),%r10
+           0.03%  │││││         0x00007f2c7fb99ce4: lea    (%r12,%r11,8),%r8
+                  │││││         0x00007f2c7fb99ce8: mov    %r8d,%r9d
+  0.38%    0.22%  │││││         0x00007f2c7fb99ceb: shr    $0x3,%r9d
+  0.01%           │││││         0x00007f2c7fb99cef: and    $0x3,%r9d
+  0.01%    0.01%  │││││         0x00007f2c7fb99cf3: xor    %r11d,%r11d
+           0.01%  │││││         0x00007f2c7fb99cf6: mov    $0x1,%ecx
+  0.38%    0.35%  │││││         0x00007f2c7fb99cfb: sub    %r9d,%ecx
+           0.03%  │││││         0x00007f2c7fb99cfe: and    $0x3,%ecx
+  0.03%           │││││         0x00007f2c7fb99d01: inc    %ecx
+                  │││││         0x00007f2c7fb99d03: cmp    %ebx,%ecx
+  0.20%    0.45%  │││││         0x00007f2c7fb99d05: cmovg  %ebx,%ecx          ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││                                                       ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+  0.01%    0.04%  │││││↗        0x00007f2c7fb99d08: mov    0x10(%r10,%r11,8),%r9
+  0.06%    0.01%  ││││││        0x00007f2c7fb99d0d: mov    %r9,0x10(%r8,%r11,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  ││││││                                                      ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@19 (line 106)
+  0.60%    0.69%  ││││││        0x00007f2c7fb99d12: inc    %r11d              ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  ││││││                                                      ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@20 (line 105)
+           0.03%  ││││││        0x00007f2c7fb99d15: cmp    %ecx,%r11d
+                  │││││╰        0x00007f2c7fb99d18: jl     0x00007f2c7fb99d08  ;*if_icmpge {reexecute=0 rethrow=0 return_oop=0}
+                  │││││                                                       ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@7 (line 105)
+                  │││││         0x00007f2c7fb99d1a: mov    %ebx,%ecx
+                  │││││         0x00007f2c7fb99d1c: add    $0xffffffffffffffe1,%ecx
+  0.28%    0.34%  │││││         0x00007f2c7fb99d1f: mov    $0x80000000,%edi
+  0.03%           │││││         0x00007f2c7fb99d24: cmp    %ecx,%ebx
+                  │││││         0x00007f2c7fb99d26: cmovl  %edi,%ecx
+  0.37%    0.45%  │││││         0x00007f2c7fb99d29: cmp    %ecx,%r11d
+                  │││││ ╭       0x00007f2c7fb99d2c: jge    0x00007f2c7fb99df7  ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │                                                     ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+  2.03%    2.07%  │││││ │↗      0x00007f2c7fb99d32: vmovdqu 0x10(%r10,%r11,8),%ymm0
+  0.34%    0.31%  │││││ ││      0x00007f2c7fb99d39: vmovdqu %ymm0,0x10(%r8,%r11,8)
+  9.67%    9.75%  │││││ ││      0x00007f2c7fb99d40: movslq %r11d,%r9
+  0.39%    0.19%  │││││ ││      0x00007f2c7fb99d43: vmovdqu 0x30(%r10,%r9,8),%ymm0
+  2.00%    1.69%  │││││ ││      0x00007f2c7fb99d4a: vmovdqu %ymm0,0x30(%r8,%r9,8)
+  7.63%   11.51%  │││││ ││      0x00007f2c7fb99d51: vmovdqu 0x50(%r10,%r9,8),%ymm0
+  2.94%    2.89%  │││││ ││      0x00007f2c7fb99d58: vmovdqu %ymm0,0x50(%r8,%r9,8)
+  7.79%    8.95%  │││││ ││      0x00007f2c7fb99d5f: vmovdqu 0x70(%r10,%r9,8),%ymm0
+  0.60%    0.25%  │││││ ││      0x00007f2c7fb99d66: vmovdqu %ymm0,0x70(%r8,%r9,8)
+ 10.19%    9.38%  │││││ ││      0x00007f2c7fb99d6d: vmovdqu 0x90(%r10,%r9,8),%ymm0
+  0.41%    0.41%  │││││ ││      0x00007f2c7fb99d77: vmovdqu %ymm0,0x90(%r8,%r9,8)
+ 10.32%    9.43%  │││││ ││      0x00007f2c7fb99d81: vmovdqu 0xb0(%r10,%r9,8),%ymm0
+  0.37%    0.04%  │││││ ││      0x00007f2c7fb99d8b: vmovdqu %ymm0,0xb0(%r8,%r9,8)
+ 10.02%    8.85%  │││││ ││      0x00007f2c7fb99d95: vmovdqu 0xd0(%r10,%r9,8),%ymm0
+  0.20%    0.13%  │││││ ││      0x00007f2c7fb99d9f: vmovdqu %ymm0,0xd0(%r8,%r9,8)
+ 10.40%    8.69%  │││││ ││      0x00007f2c7fb99da9: vmovdqu 0xf0(%r10,%r9,8),%ymm0
+  0.20%    0.04%  │││││ ││      0x00007f2c7fb99db3: vmovdqu %ymm0,0xf0(%r8,%r9,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ ││                                                    ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@19 (line 106)
+  8.67%    7.62%  │││││ ││      0x00007f2c7fb99dbd: add    $0x20,%r11d        ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ ││                                                    ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@20 (line 105)
+  0.06%    0.04%  │││││ ││      0x00007f2c7fb99dc1: cmp    %ecx,%r11d
+                  │││││ │╰      0x00007f2c7fb99dc4: jl     0x00007f2c7fb99d32  ;*if_icmpge {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │                                                     ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@7 (line 105)
+  0.06%    0.03%  │││││ │       0x00007f2c7fb99dca: mov    %ebx,%r9d
+                  │││││ │       0x00007f2c7fb99dcd: add    $0xfffffffffffffffd,%r9d
+  0.23%    0.20%  │││││ │       0x00007f2c7fb99dd1: cmp    %r9d,%ebx
+                  │││││ │       0x00007f2c7fb99dd4: cmovl  %edi,%r9d
+  0.04%    0.03%  │││││ │       0x00007f2c7fb99dd8: cmp    %r9d,%r11d
+                  │││││ │ ╭     0x00007f2c7fb99ddb: jge    0x00007f2c7fb99df7
+  0.35%    0.45%  │││││ │ │     0x00007f2c7fb99ddd: xchg   %ax,%ax            ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │ │                                                   ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+                  │││││ │ │↗    0x00007f2c7fb99de0: vmovdqu 0x10(%r10,%r11,8),%ymm0
+  0.34%    0.39%  │││││ │ ││    0x00007f2c7fb99de7: vmovdqu %ymm0,0x10(%r8,%r11,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │ ││                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@19 (line 106)
+  0.28%    0.26%  │││││ │ ││    0x00007f2c7fb99dee: add    $0x4,%r11d         ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │ ││                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@20 (line 105)
+  1.92%    1.62%  │││││ │ ││    0x00007f2c7fb99df2: cmp    %r9d,%r11d
+                  │││││ │ │╰    0x00007f2c7fb99df5: jl     0x00007f2c7fb99de0  ;*if_icmpge {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │ │                                                   ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@7 (line 105)
+           0.01%  │││││ ↘ ↘     0x00007f2c7fb99df7: cmp    %ebx,%r11d
+                  │││││     ╭   0x00007f2c7fb99dfa: jge    0x00007f2c7fb99e0e  ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││     │                                                 ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+  0.10%    0.13%  │││││     │↗  0x00007f2c7fb99dfc: mov    0x10(%r10,%r11,8),%r9
+  0.10%    0.10%  │││││     ││  0x00007f2c7fb99e01: mov    %r9,0x10(%r8,%r11,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││     ││                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@19 (line 106)
+  0.47%    0.77%  │││││     ││  0x00007f2c7fb99e06: inc    %r11d              ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││     ││                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@20 (line 105)
+  0.03%    0.01%  │││││     ││  0x00007f2c7fb99e09: cmp    %ebx,%r11d
+                  │││││     │╰  0x00007f2c7fb99e0c: jl     0x00007f2c7fb99dfc  ;*if_icmpge {reexecute=0 rethrow=0 return_oop=0}
+                  │││││     │                                                 ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@7 (line 105)
+  0.09%    0.04%  ↘││││     ↘   0x00007f2c7fb99e0e: vzeroupper 
+  0.39%    0.39%   ││││         0x00007f2c7fb99e11: add    $0x10,%rsp
+  0.01%    0.01%   ││││         0x00007f2c7fb99e15: pop    %rbp
+  0.28%    0.22%   ││││         0x00007f2c7fb99e16: test   %eax,0x184af1e4(%rip)        # 0x00007f2c98049000
+                   ││││                                                       ;   {poll_return}
+  0.04%            ││││         0x00007f2c7fb99e1c: retq   
+                   ↘↘↘↘         0x00007f2c7fb99e1d: mov    $0xffffff86,%esi
+                                0x00007f2c7fb99e22: mov    %rcx,%rbp
+                                0x00007f2c7fb99e25: xchg   %ax,%ax
+                                0x00007f2c7fb99e28: vzeroupper 
+                                0x00007f2c7fb99e2b: callq  0x00007f2c780d9860  ; ImmutableOopMap{rbp=Oop }
+                                                                              ;*getstatic destination {reexecute=1 rethrow=0 return_oop=0}
+                                                                              ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy@10 (line 106)
+                                                                              ;   {runtime_call UncommonTrapBlob}
+                                0x00007f2c7fb99e30: callq  0x00007f2c96c403f0  ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+....................................................................................................
+ 96.10%   96.61%  <total for region 1>
+
+....[Hottest Regions]...............................................................................
+ 96.10%   96.61%  [0x7f2c7fb99c60:0x7f2c7fb99e30] in net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy
+  1.14%    1.08%  [0x7f2c7fb9ba88:0x7f2c7fb9badd] in net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_manualCopy_jmhTest::manualCopy_avgt_jmhStub
+  0.54%    0.53%  [0xffffffff810603fa:0xffffffff810603fa] in [unknown] ([unknown])
+  0.07%    0.01%  [0xffffffff817f2c90:0xffffffff817f2cb7] in [unknown] ([unknown])
+  0.06%    0.12%  [0x7f2c9680c940:0x7f2c9680c96f] in _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.04%    0.04%  [0xffffffff81175642:0xffffffff81175642] in [unknown] ([unknown])
+  0.04%           [0xffffffff812d3650:0xffffffff812d3653] in [unknown] ([unknown])
+  0.04%    0.06%  [0x7f2c96c51170:0x7f2c96c511b6] in _ZN10fileStream5writeEPKcm (libjvm.so)
+  0.03%           [0xffffffff810bd094:0xffffffff810bd094] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff810dd35e:0xffffffff810dd388] in [unknown] ([unknown])
+  0.03%           [0xffffffff812d3124:0xffffffff812d3143] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff813d3755:0xffffffff813d3757] in [unknown] ([unknown])
+  0.03%    0.03%  [0xffffffff817f0c60:0xffffffff817f0c60] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff817f2aa6:0xffffffff817f2aa6] in [unknown] ([unknown])
+  0.03%           [0xffffffff817f2d4e:0xffffffff817f2d4e] in [unknown] ([unknown])
+  0.03%           [0x7f2c96929d39:0x7f2c96929d3d] in _ZN13InstanceKlass17find_method_indexEPK5ArrayIP6MethodEPK6SymbolS8_N5Klass18OverpassLookupModeENS9_16StaticLookupModeENS9_17PrivateLookupModeE (libjvm.so)
+  0.03%           [0x7f2c96c52066:0x7f2c96c52068] in _ZN12outputStream44do_vsnprintf_and_write_with_automatic_bufferEPKcP13__va_list_tagb (libjvm.so)
+  0.03%           [0x7f2c97c1aad2:0x7f2c97c1aad2] in __pthread_disable_asynccancel (libpthread-2.21.so)
+  0.03%    0.01%  [0x7f2c97c1adad:0x7f2c97c1adad] in [unknown] (libpthread-2.21.so)
+  0.01%           [0xffffffff8101e2d0:0xffffffff8101e2d0] in [unknown] ([unknown])
+  1.61%    1.46%  <...other 186 warm regions...>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+....[Hottest Methods (after inlining)]..............................................................
+ 96.10%   96.61%  net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy
+  1.68%    1.20%  [unknown] ([unknown])
+  1.14%    1.08%  net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_manualCopy_jmhTest::manualCopy_avgt_jmhStub
+  0.06%    0.12%  _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.04%    0.06%  _ZN10fileStream5writeEPKcm (libjvm.so)
+  0.04%    0.06%  _ZN9xmlStream10write_textEPKcm (libjvm.so)
+  0.04%    0.10%  vfprintf (libc-2.21.so)
+  0.04%    0.03%  print_insn (hsdis-amd64.so)
+  0.03%    0.01%  [unknown] (libpthread-2.21.so)
+  0.03%           __pthread_disable_asynccancel (libpthread-2.21.so)
+  0.03%    0.01%  _ZN12outputStream44do_vsnprintf_and_write_with_automatic_bufferEPKcP13__va_list_tagb (libjvm.so)
+  0.03%           _ZN13InstanceKlass17find_method_indexEPK5ArrayIP6MethodEPK6SymbolS8_N5Klass18OverpassLookupModeENS9_16StaticLookupModeENS9_17PrivateLookupModeE (libjvm.so)
+  0.03%    0.10%  _ZN13RelocIterator10set_limitsEPhS0_.part.33 (libjvm.so)
+  0.01%    0.07%  _IO_default_xsputn (libc-2.21.so)
+  0.01%           _ZN10decode_env12handle_eventEPKcPh (libjvm.so)
+  0.01%           <stub: areturn  176 areturn>
+  0.01%           _Z23resource_allocate_bytesmN17AllocFailStrategy13AllocFailEnumE (libjvm.so)
+  0.01%           _ZN16LIR_OpVisitState5visitEP6LIR_Op (libjvm.so)
+  0.01%           java.lang.Throwable::<init>
+  0.01%           __strcpy_sse2_unaligned (libc-2.21.so)
+  0.58%    0.09%  <...other 40 warm methods...>
+....................................................................................................
+ 99.99%   99.55%  <totals>
+
+....[Distribution by Area]..........................................................................
+ 97.35%   97.74%  <generated code>
+  1.68%    1.20%  <native code in ([unknown])>
+  0.60%    0.66%  <native code in (libjvm.so)>
+  0.18%    0.34%  <native code in (libc-2.21.so)>
+  0.09%    0.06%  <native code in (hsdis-amd64.so)>
+  0.06%    0.01%  <native code in (libpthread-2.21.so)>
+  0.01%           <native code in (perf-16225.map)>
+  0.01%           <native code in (ld-2.21.so)>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+
+
+# JMH 1.11.3 (released 77 days ago)
+# VM version: JDK 9-ea, VM 9-ea+111
+# VM invoker: /home/balazsa/Downloads/jdk-9-111/bin/java
+# VM options: -Djol.tryWithSudo=true
+# Warmup: 5 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: net.greypanther.BenchmarkLongArrayCopyStandalone2.manualCopy_Dec
+# Parameters: (size = 1024)
+
+# Run progress: 66.67% complete, ETA 00:00:22
+# Fork: 1 of 1
+# Preparing profilers: LinuxPerfAsmProfiler 
+# Profilers consume stdout and stderr from target VM, use -v EXTRA to copy to console
+# Warmup Iteration   1: 56 Allocated source
+56 40 32 32 8 48 8 40 48 Allocated destination
+Source alignment: 0
+Destination alignment: 0
+90.786 ns/op
+# Warmup Iteration   2: 88.406 ns/op
+# Warmup Iteration   3: 90.053 ns/op
+# Warmup Iteration   4: 87.700 ns/op
+# Warmup Iteration   5: 87.741 ns/op
+Iteration   1: 87.981 ns/op
+Iteration   2: 88.473 ns/op
+Iteration   3: 89.447 ns/op
+Iteration   4: 87.100 ns/op
+Iteration   5: 86.696 ns/op
+# Processing profiler results: LinuxPerfAsmProfiler 
+
+
+Result "manualCopy_Dec":
+  87.939 ±(99.9%) 4.223 ns/op [Average]
+  (min, avg, max) = (86.696, 87.939, 89.447), stdev = 1.097
+  CI (99.9%): [83.717, 92.162] (assumes normal distribution)
+
+Secondary result "·asm":
+PrintAssembly processed: 154755 total address lines.
+Perf output processed (skipped 18.718 seconds):
+ Column 1: cycles (6813 events)
+ Column 2: instructions (6807 events)
+
+Hottest code regions (>10.00% "cycles" events):
+....[Hottest Region 1]..............................................................................
+ [0x7f491bb99760:0x7f491bb99930] in net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec
+
+                                  # {method} {0x00007f48ddeb2f60} &apos;manualCopy_Dec&apos; &apos;()V&apos; in &apos;net/greypanther/BenchmarkLongArrayCopyStandalone2&apos;
+                                  #           [sp+0x20]  (sp of caller)
+                                  0x00007f491bb99760: mov    0x8(%rsi),%r10d
+                                  0x00007f491bb99764: shl    $0x3,%r10
+                                  0x00007f491bb99768: cmp    %r10,%rax
+                                  0x00007f491bb9976b: jne    0x00007f49140d7f60  ;   {runtime_call ic_miss_stub}
+                                  0x00007f491bb99771: xchg   %ax,%ax
+                                  0x00007f491bb99774: nopl   0x0(%rax,%rax,1)
+                                  0x00007f491bb9977c: xchg   %ax,%ax
+                                [Verified Entry Point]
+  0.04%    0.09%                  0x00007f491bb99780: mov    %eax,-0x14000(%rsp)
+  0.25%    0.13%                  0x00007f491bb99787: push   %rbp
+  0.01%    0.06%                  0x00007f491bb99788: sub    $0x10,%rsp         ;*synchronization entry
+                                                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@-1 (line 112)
+  0.32%    0.37%                  0x00007f491bb9978c: mov    0xc(%rsi),%ecx     ;*getfield size {reexecute=0 rethrow=0 return_oop=0}
+                                                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@1 (line 112)
+  0.03%    0.01%                  0x00007f491bb9978f: mov    %ecx,%ebx
+  0.06%    0.06%                  0x00007f491bb99791: dec    %ebx               ;*isub {reexecute=0 rethrow=0 return_oop=0}
+                                                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@5 (line 112)
+  0.04%    0.06%                  0x00007f491bb99793: test   %ebx,%ebx
+                  ╭               0x00007f491bb99795: jl     0x00007f491bb99911  ;*iflt {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                             ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@8 (line 112)
+  0.15%    0.44%  │               0x00007f491bb9979b: mov    $0x6c6c5e9c0,%r10  ;   {oop(a &apos;java/lang/Class&apos; = &apos;net/greypanther/BenchmarkLongArrayCopyStandalone2&apos;)}
+  0.03%    0.19%  │               0x00007f491bb997a5: mov    0x78(%r10),%r11d   ;*getstatic source {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                             ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@15 (line 113)
+  0.04%    0.04%  │               0x00007f491bb997a9: mov    0xc(%r12,%r11,8),%r9d  ;*laload {reexecute=0 rethrow=0 return_oop=0}
+                  │                                                             ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@19 (line 113)
+                  │                                                             ; implicit exception: dispatches to 0x00007f491bb99920
+  0.10%    0.16%  │               0x00007f491bb997ae: test   %r9d,%r9d
+                  │╭              0x00007f491bb997b1: jbe    0x00007f491bb99920
+  0.12%    0.46%  ││              0x00007f491bb997b7: cmp    %r9d,%ebx
+                  ││╭             0x00007f491bb997ba: jae    0x00007f491bb99920
+  0.10%    0.13%  │││             0x00007f491bb997c0: mov    0x7c(%r10),%r10d   ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││                                                           ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+  0.04%    0.06%  │││             0x00007f491bb997c4: mov    0xc(%r12,%r10,8),%r9d  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││                                                           ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@20 (line 113)
+                  │││                                                           ; implicit exception: dispatches to 0x00007f491bb99920
+  0.01%    0.12%  │││             0x00007f491bb997c9: test   %r9d,%r9d
+                  │││╭            0x00007f491bb997cc: jbe    0x00007f491bb99920
+  0.15%    0.37%  ││││            0x00007f491bb997d2: cmp    %r9d,%ebx
+                  ││││╭           0x00007f491bb997d5: jae    0x00007f491bb99920
+  0.09%    0.10%  │││││           0x00007f491bb997db: shl    $0x3,%r11
+  0.03%    0.03%  │││││           0x00007f491bb997df: shl    $0x3,%r10
+  0.09%    0.10%  │││││           0x00007f491bb997e3: mov    %r10d,%r8d
+  0.22%    0.31%  │││││           0x00007f491bb997e6: shr    $0x3,%r8d
+  0.01%    0.07%  │││││           0x00007f491bb997ea: and    $0x3,%r8d
+  0.03%    0.04%  │││││           0x00007f491bb997ee: add    %ecx,%r8d
+  0.07%    0.12%  │││││           0x00007f491bb997f1: add    $0xfffffffffffffffd,%r8d
+  0.23%    0.32%  │││││           0x00007f491bb997f5: and    $0x3,%r8d
+  0.01%    0.09%  │││││           0x00007f491bb997f9: sub    %r8d,%ecx
+  0.10%    0.09%  │││││           0x00007f491bb997fc: add    $0xfffffffffffffffe,%ecx
+  0.04%    0.03%  │││││           0x00007f491bb997ff: mov    $0xffffffff,%r9d
+  0.15%    0.43%  │││││           0x00007f491bb99805: cmp    %r9d,%ecx
+  0.09%    0.25%  │││││           0x00007f491bb99808: cmovl  %r9d,%ecx          ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││                                                         ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+  0.21%    0.07%  │││││↗          0x00007f491bb9980c: mov    0x10(%r11,%rbx,8),%r8
+  0.54%    0.60%  ││││││          0x00007f491bb99811: mov    %r8,0x10(%r10,%rbx,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  ││││││                                                        ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@20 (line 113)
+  0.07%    0.19%  ││││││          0x00007f491bb99816: dec    %ebx               ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  ││││││                                                        ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@21 (line 112)
+  0.03%    0.19%  ││││││          0x00007f491bb99818: cmp    %ecx,%ebx
+                  │││││╰          0x00007f491bb9981a: jg     0x00007f491bb9980c  ;*iflt {reexecute=0 rethrow=0 return_oop=0}
+                  │││││                                                         ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@8 (line 112)
+  0.07%    0.06%  │││││           0x00007f491bb9981c: cmp    $0x1e,%ebx
+                  │││││ ╭         0x00007f491bb9981f: jle    0x00007f491bb998f9
+  0.23%    0.32%  │││││ │╭        0x00007f491bb99825: jmp    0x00007f491bb99853
+  0.37%    0.29%  │││││ ││   ↗    0x00007f491bb99827: add    $0xffffffffffffffe0,%ebx  ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ ││   │                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+  0.01%           │││││ ││↗  │    0x00007f491bb9982a: vmovdqu -0x8(%r11,%rbx,8),%ymm0
+  0.15%    0.04%  │││││ │││  │    0x00007f491bb99831: vmovdqu %ymm0,-0x8(%r10,%rbx,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │││  │                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@20 (line 113)
+  0.82%    0.44%  │││││ │││  │    0x00007f491bb99838: add    $0xfffffffffffffffc,%ebx  ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │││  │                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@21 (line 112)
+  1.51%    1.56%  │││││ │││  │    0x00007f491bb9983b: cmp    $0x2,%ebx
+                  │││││ ││╰  │    0x00007f491bb9983e: jg     0x00007f491bb9982a  ;*iflt {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ ││   │                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@8 (line 112)
+                  │││││ ││ ╭ │    0x00007f491bb99840: jmpq   0x00007f491bb998f9
+                  │││││ ││ │ │    0x00007f491bb99845: nopw   0x0(%rax,%rax,1)
+                  │││││ ││ │↗│    0x00007f491bb99850: mov    %r8d,%ebx          ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ ││ │││                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+  9.01%    9.39%  │││││ │↘ │││    0x00007f491bb99853: vmovdqu -0x8(%r11,%rbx,8),%ymm0
+  0.10%    0.06%  │││││ │  │││    0x00007f491bb9985a: vmovdqu %ymm0,-0x8(%r10,%rbx,8)
+  2.07%    2.48%  │││││ │  │││    0x00007f491bb99861: vmovdqu -0x28(%r11,%rbx,8),%ymm0
+  0.25%    0.24%  │││││ │  │││    0x00007f491bb99868: vmovdqu %ymm0,-0x28(%r10,%rbx,8)
+ 12.95%   20.68%  │││││ │  │││    0x00007f491bb9986f: vmovdqu -0x48(%r11,%rbx,8),%ymm0
+  0.04%    0.04%  │││││ │  │││    0x00007f491bb99876: vmovdqu %ymm0,-0x48(%r10,%rbx,8)
+  7.59%    9.74%  │││││ │  │││    0x00007f491bb9987d: vmovdqu -0x68(%r11,%rbx,8),%ymm0
+  0.19%    0.18%  │││││ │  │││    0x00007f491bb99884: vmovdqu %ymm0,-0x68(%r10,%rbx,8)
+ 11.45%    8.07%  │││││ │  │││    0x00007f491bb9988b: vmovdqu -0x88(%r11,%rbx,8),%ymm0
+  2.76%    3.04%  │││││ │  │││    0x00007f491bb99895: vmovdqu %ymm0,-0x88(%r10,%rbx,8)
+  8.41%    9.45%  │││││ │  │││    0x00007f491bb9989f: vmovdqu -0xa8(%r11,%rbx,8),%ymm0
+  0.01%           │││││ │  │││    0x00007f491bb998a9: vmovdqu %ymm0,-0xa8(%r10,%rbx,8)
+ 14.91%   11.25%  │││││ │  │││    0x00007f491bb998b3: vmovdqu -0xc8(%r11,%rbx,8),%ymm0
+  0.04%    0.03%  │││││ │  │││    0x00007f491bb998bd: vmovdqu %ymm0,-0xc8(%r10,%rbx,8)
+  7.72%    5.98%  │││││ │  │││    0x00007f491bb998c7: vmovdqu -0xe8(%r11,%rbx,8),%ymm0
+           0.01%  │││││ │  │││    0x00007f491bb998d1: vmovdqu %ymm0,-0xe8(%r10,%rbx,8)
+                  │││││ │  │││                                                  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │  │││                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@20 (line 113)
+  9.25%    5.22%  │││││ │  │││    0x00007f491bb998db: mov    %ebx,%r8d
+                  │││││ │  │││    0x00007f491bb998de: add    $0xffffffffffffffe0,%r8d  ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │  │││                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@21 (line 112)
+  1.54%    1.03%  │││││ │  │││    0x00007f491bb998e2: cmp    $0x1e,%r8d
+                  │││││ │  │╰│    0x00007f491bb998e6: jg     0x00007f491bb99850  ;*iflt {reexecute=0 rethrow=0 return_oop=0}
+                  │││││ │  │ │                                                  ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@8 (line 112)
+                  │││││ │  │ │    0x00007f491bb998ec: cmp    $0x2,%r8d
+                  │││││ │  │ ╰    0x00007f491bb998f0: jg     0x00007f491bb99827
+                  │││││ │  │      0x00007f491bb998f6: mov    %r8d,%ebx
+  0.04%    0.01%  │││││ ↘  ↘      0x00007f491bb998f9: cmp    $0xffffffffffffffff,%ebx
+                  │││││       ╭   0x00007f491bb998fc: jle    0x00007f491bb99911
+  0.28%    0.15%  │││││       │   0x00007f491bb998fe: xchg   %ax,%ax            ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+                  │││││       │                                                 ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+  0.25%    0.43%  │││││       │↗  0x00007f491bb99900: mov    0x10(%r11,%rbx,8),%r8
+                  │││││       ││  0x00007f491bb99905: mov    %r8,0x10(%r10,%rbx,8)  ;*lastore {reexecute=0 rethrow=0 return_oop=0}
+                  │││││       ││                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@20 (line 113)
+  0.03%    0.06%  │││││       ││  0x00007f491bb9990a: dec    %ebx               ;*iinc {reexecute=0 rethrow=0 return_oop=0}
+                  │││││       ││                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@21 (line 112)
+  0.29%    0.40%  │││││       ││  0x00007f491bb9990c: cmp    $0xffffffffffffffff,%ebx
+                  │││││       │╰  0x00007f491bb9990f: jg     0x00007f491bb99900  ;*iflt {reexecute=0 rethrow=0 return_oop=0}
+                  │││││       │                                                 ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@8 (line 112)
+  0.13%    0.19%  ↘││││       ↘   0x00007f491bb99911: vzeroupper 
+  0.40%    0.16%   ││││           0x00007f491bb99914: add    $0x10,%rsp
+                   ││││           0x00007f491bb99918: pop    %rbp
+  0.04%    0.04%   ││││           0x00007f491bb99919: test   %eax,0x181d66e1(%rip)        # 0x00007f4933d70000
+                   ││││                                                         ;   {poll_return}
+  0.23%    0.34%   ││││           0x00007f491bb9991f: retq   
+                   ↘↘↘↘           0x00007f491bb99920: mov    $0xffffff86,%esi
+                                  0x00007f491bb99925: mov    %ebx,%ebp
+                                  0x00007f491bb99927: nop    
+                                  0x00007f491bb99928: vzeroupper 
+                                  0x00007f491bb9992b: callq  0x00007f49140d9860  ; ImmutableOopMap{}
+                                                                                ;*getstatic destination {reexecute=1 rethrow=0 return_oop=0}
+                                                                                ; - net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec@11 (line 113)
+                                                                                ;   {runtime_call UncommonTrapBlob}
+                                  0x00007f491bb99930: callq  0x00007f49329673f0  ;*getstatic destination {reexecute=0 rethrow=0 return_oop=0}
+....................................................................................................
+ 96.71%   97.16%  <total for region 1>
+
+....[Hottest Regions]...............................................................................
+ 96.71%   97.16%  [0x7f491bb99760:0x7f491bb99930] in net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec
+  1.13%    0.94%  [0x7f491bb9c988:0x7f491bb9c9dd] in net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_manualCopy_Dec_jmhTest::manualCopy_Dec_avgt_jmhStub
+  0.22%    0.21%  [0xffffffff810603fa:0xffffffff810603fa] in [unknown] ([unknown])
+  0.07%    0.07%  [0x7f4932a156b8:0x7f4932a156e9] in _ZN13RelocIterator10set_limitsEPhS0_.part.33 (libjvm.so)
+  0.04%           [0xffffffff8120019b:0xffffffff812001a8] in [unknown] ([unknown])
+  0.04%           [0xffffffff813d3757:0xffffffff813d3757] in [unknown] ([unknown])
+  0.04%           [0xffffffff817f2c90:0xffffffff817f2c90] in [unknown] ([unknown])
+  0.04%    0.03%  [0x7f4932533944:0x7f4932533956] in _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.04%           [0x7f49331e26cd:0x7f49331e26f6] in __strchrnul (libc-2.21.so)
+  0.03%    0.03%  [0xffffffff810a3cf3:0xffffffff810a3cf3] in [unknown] ([unknown])
+  0.03%    0.03%  [0xffffffff810b8206:0xffffffff810b8206] in [unknown] ([unknown])
+  0.03%           [0xffffffff810c3a13:0xffffffff810c3a13] in [unknown] ([unknown])
+  0.03%           [0xffffffff810dd366:0xffffffff810dd37c] in [unknown] ([unknown])
+  0.03%           [0xffffffff8121aec6:0xffffffff8121aec6] in [unknown] ([unknown])
+  0.03%    0.01%  [0xffffffff81283812:0xffffffff81283812] in [unknown] ([unknown])
+  0.03%           [0xffffffff817f0bd9:0xffffffff817f0bd9] in [unknown] ([unknown])
+  0.03%    0.03%  [0xffffffff817f2a8b:0xffffffff817f2aa6] in [unknown] ([unknown])
+  0.03%           [0xffffffffc020489b:0xffffffffc020489b] in [unknown] ([unknown])
+  0.03%           [0x7f49329781b0:0x7f49329781bb] in _ZN10fileStream5writeEPKcm (libjvm.so)
+  0.03%    0.01%  [0x7f4933196b1d:0x7f4933196b28] in vfprintf (libc-2.21.so)
+  1.31%    1.47%  <...other 162 warm regions...>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+....[Hottest Methods (after inlining)]..............................................................
+ 96.71%   97.16%  net.greypanther.BenchmarkLongArrayCopyStandalone2::manualCopy_Dec
+  1.22%    0.97%  [unknown] ([unknown])
+  1.13%    0.94%  net.greypanther.generated.BenchmarkLongArrayCopyStandalone2_manualCopy_Dec_jmhTest::manualCopy_Dec_avgt_jmhStub
+  0.07%    0.07%  vfprintf (libc-2.21.so)
+  0.07%    0.12%  _ZN13RelocIterator10set_limitsEPhS0_.part.33 (libjvm.so)
+  0.04%    0.07%  _ZN10fileStream5writeEPKcm (libjvm.so)
+  0.04%    0.04%  _ZN14ElfSymbolTable6lookupEPhPiS1_S1_P16ElfFuncDescTable (libjvm.so)
+  0.04%           __strchrnul (libc-2.21.so)
+  0.03%           _ZN10decode_env12handle_eventEPKcPh (libjvm.so)
+  0.03%    0.01%  _IO_fwrite (libc-2.21.so)
+  0.03%    0.01%  _IO_old_init (libc-2.21.so)
+  0.01%           <stub: fast_aaccess_0  221 fast_aaccess_0>
+  0.01%    0.03%  _IO_default_xsputn (libc-2.21.so)
+  0.01%           _ZN11Compilation14compile_methodEv (libjvm.so)
+  0.01%    0.03%  _ZN9xmlStream10write_textEPKcm (libjvm.so)
+  0.01%           _ZN10LinearScan26resolve_exception_handlersEv (libjvm.so)
+  0.01%           [unknown] (libpthread-2.21.so)
+  0.01%           _ZN12Dependencies19write_dependency_toEP10CompileLogNS_7DepTypeEP13GrowableArrayIP12ciBaseObjectEP5Klass.part.94.constprop.123 (libjvm.so)
+  0.01%    0.01%  _ZN7UNICODE11utf8_lengthEPai (libjvm.so)
+  0.01%           _ZNK5Klass13external_nameEv (libjvm.so)
+  0.43%    0.12%  <...other 29 warm methods...>
+....................................................................................................
+ 99.99%   99.60%  <totals>
+
+....[Distribution by Area]..........................................................................
+ 97.92%   98.12%  <generated code>
+  1.22%    0.97%  <native code in ([unknown])>
+  0.51%    0.63%  <native code in (libjvm.so)>
+  0.28%    0.22%  <native code in (libc-2.21.so)>
+  0.03%    0.03%  <native code in (hsdis-amd64.so)>
+  0.03%    0.03%  <native code in (libpthread-2.21.so)>
+....................................................................................................
+ 99.99%  100.00%  <totals>
+
+
+
+# Run complete. Total time: 00:01:11
+
+Benchmark                                              (size)  Mode  Cnt    Score    Error  Units
+BenchmarkLongArrayCopyStandalone2.arraycopy              1024  avgt    5  195.104 ± 39.240  ns/op
+BenchmarkLongArrayCopyStandalone2.arraycopy:·asm         1024  avgt           NaN             ---
+BenchmarkLongArrayCopyStandalone2.manualCopy             1024  avgt    5   95.429 ± 21.348  ns/op
+BenchmarkLongArrayCopyStandalone2.manualCopy:·asm        1024  avgt           NaN             ---
+BenchmarkLongArrayCopyStandalone2.manualCopy_Dec         1024  avgt    5   87.939 ±  4.223  ns/op
+BenchmarkLongArrayCopyStandalone2.manualCopy_Dec:·asm    1024  avgt           NaN             ---

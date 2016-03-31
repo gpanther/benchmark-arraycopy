@@ -26,16 +26,18 @@ import org.openjdk.jol.util.VMSupport;
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 public class BenchmarkLongArrayCopyStandalone2 {
 	private static final int MAXIMUM_SIZE = 10_000;
+	private static final boolean ALIGN_FIRST_ELEMENT = System.getProperties().containsKey("alignFirstElement");
 
 	@SuppressWarnings("unused")
 	private static byte[] padding1, padding2;
 	private static long[] source, destination;
+	private static long sourceAddress, destinationAddress;
 
 	static {
 		Random randomRandom = new Random();
 
 		while (true) {
-			padding1 = new byte[randomRandom.nextInt(128)];
+			padding1 = new byte[randomRandom.nextInt(64)];
 			source = new long[MAXIMUM_SIZE];
 
 			for (int i = 0; i < 10; ++i) {
@@ -53,7 +55,7 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		System.out.println("Allocated source");
 
 		while (true) {
-			padding2 = new byte[randomRandom.nextInt(128)];
+			padding2 = new byte[randomRandom.nextInt(64)];
 			destination = new long[MAXIMUM_SIZE];
 
 			for (int i = 0; i < 10; ++i) {
@@ -74,14 +76,12 @@ public class BenchmarkLongArrayCopyStandalone2 {
 		for (int i = 0; i < MAXIMUM_SIZE; ++i) {
 			source[i] = r.nextInt();
 		}
-	}
 
-	private static void sleep(long duration, TimeUnit timeUnit) {
-		try {
-			Thread.sleep(timeUnit.toMillis(duration));
-		} catch (InterruptedException e) {
-			throw new AssertionError();
-		}
+		System.out.println("Source alignment: " + alignment(source));
+		System.out.println("Destination alignment: " + alignment(destination));
+
+		sourceAddress = VMSupport.addressOf(source);
+		destinationAddress = VMSupport.addressOf(destination);
 	}
 
 	@Param({ "1024" })
@@ -90,6 +90,14 @@ public class BenchmarkLongArrayCopyStandalone2 {
 	@Benchmark
 	public final void arraycopy() {
 		System.arraycopy(source, 0, destination, 0, size);
+	}
+
+	private static void sleep(long duration, TimeUnit timeUnit) {
+		try {
+			Thread.sleep(timeUnit.toMillis(duration));
+		} catch (InterruptedException e) {
+			throw new AssertionError();
+		}
 	}
 
 	@Benchmark
@@ -108,19 +116,21 @@ public class BenchmarkLongArrayCopyStandalone2 {
 
 	@Setup
 	public void setUp() {
-		if (alignment(source) != 0) {
+		if (VMSupport.addressOf(source) != sourceAddress) {
 			throw new IllegalArgumentException("source");
 		}
 
-		if (alignment(destination) != 0) {
+		if (VMSupport.addressOf(destination) != destinationAddress) {
 			throw new IllegalArgumentException("destination");
 		}
 	}
 
+	@SuppressWarnings("restriction")
 	private static long alignment(long[] array) {
 		long address = VMSupport.addressOf(array);
-		@SuppressWarnings("restriction")
-		long addressAlignment = (address + sun.misc.Unsafe.ARRAY_LONG_BASE_OFFSET) % 32;
-		return addressAlignment;
+		if (ALIGN_FIRST_ELEMENT) {
+			address += sun.misc.Unsafe.ARRAY_LONG_BASE_OFFSET;
+		}
+		return address % 64;
 	}
 }
